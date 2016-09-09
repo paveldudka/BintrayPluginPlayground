@@ -1,4 +1,16 @@
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
+
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'com.novoda.bintray-release' // must be applied after your artifact generating plugin (eg. java / com.android.library)
 
 android {
     compileSdkVersion 24
@@ -28,4 +40,31 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.0'
     testCompile 'junit:junit:4.12'
+}
+
+publishing {
+    publications {
+        aar(MavenPublication) {
+            groupId 'com.trickyandroid'
+            version = '0.1.0'
+            artifactId 'test-lib'
+
+            // Tell maven to prepare the generated "*.aar" file for publishing
+            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+
+            pom.withXml {
+                asNode().appendNode('description', 'My custom POM thingy')
+            }
+        }
+    }
+}
+
+publish {
+    userOrg = 'userOrg'
+    groupId = 'com.trickyandroid'
+    artifactId = 'test-lib'
+    publishVersion = '0.1.0'
+    desc = "That's just an awesome lib. Must have!"
+    website = 'https://github.com/paveldudka/BintrayPluginPlayground'
+    publications=['aar']
 }
